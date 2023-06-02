@@ -6,6 +6,7 @@
 \usepackage{physics}
 \usepackage{graphicx}
 \usepackage{esint}
+\usepackage{color}
 \usepackage[margin=2cm]{geometry}
 \usepackage{bbold}
 \numberwithin{equation}{section}
@@ -16,16 +17,80 @@
 \newcommand{\projection}{\bra{\phi}}
 \newcommand{\annihilation}{c^{}}
 \newcommand{\creation}{c^{\dagger}}
-\title{Mean First Passage time of Quantum Processes}
-\author{G. Li}
-\date{December 2021}
+\newcommand{\bcomment}[1]{\textcolor{blue}{#1}}
+\newcommand{\dint}[1]{\mathrm{d}{#1}\,}
+\title{Results}
+\date{May 2023}
 \begin{document}
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.2]{Logo.png}
-\end{figure}
 \maketitle
 \newpage
 \tableofcontents
 \newpage
+\section{Using the Density of States}
+Let $\phi_k$ be the eigenstates of $\H$:
+\begin{equation}
+    \phi_k=\sum_k c_{kn} \ket{n}
+\end{equation}
+\bcomment{The $c_{kn}$ are unitary and $c_{kn}^{\dagger} = c_{nk}$. The $c$ as notation is not ideal if we want to use it for the ladder operators. }
+The Loschmidt echo is given by:
+\begin{equation}
+    L(t)=\bra{0}e^{-i\H t}\ket{0}
+\end{equation}
+we can rewrite $\ket{0}$ as a linear combination of $\phi_k$:
+\begin{equation}
+    \ket{0}=\sum_k b_k \phi_k = \bcomment{\sum_k c_{0,k} \phi_k}
+\end{equation}
+so the lsochmidt echo becomes
+\begin{equation}
+    L(t)=\sum_k \abs{b_k}^2 e^{-iE_kt}
+\end{equation}
+The coefficients $b_k$ are given by $c_{k0}$, the Loschmidt simply becomes:
+\begin{equation}
+    L(t)=\sum_k \abs{c_{k0}}\bcomment{^2} e^{-iE_kt }
+\end{equation}
+For the tight binding model one $\abs{c_{k0}}^2=1/L$, one can also calculate the density of states $g(E)$ \bcomment{where is the minus sign from?}:
+\begin{equation}
+    g(E)=\frac{-L}{2\pi}\frac{1}{\sqrt{4-E^2}}
+\end{equation}
+The Loschmidt Echo should then simplify into:
+\begin{equation}
+    L(t)=\frac{1}{L}\sum_k e^{-iE_k t}=\int_{\bcomment{-2}}^{\bcomment{2}} \frac{1}{2\pi} \frac{e^{-iEt}}{\sqrt{4-E^2}} dE
+\end{equation}
+For the tight binding model we know that $L(t)=J_0(2t)$, searching online I found that Eq.(1.7) is very similar to the modified bessel function of the second kind $K_0$:
+\begin{equation}
+    2K_0(\omega)=\int_{-\infty}^\infty \frac{e^{i\omega t}}{\sqrt{t^2-1}}dt
+\end{equation}
+\bcomment{A more useful identity is}
+\begin{align}
+  \frac{1}{2\pi}  \int_{-2}^2 \dint{E} \frac{e^{-iE \tau}}{\sqrt{4-E^2}} = \frac{1}{2}J_0(2 \tau)
+\end{align}
+
+it seems reasonable to then approximate $c_{k0}$ with the exponentially decreasing function with the Lyapunov exponent and the integral with the density of states:
+\begin{equation}
+    L(t)=\int_{-\infty}^\infty c_{k0} g(E) e^{-iE t} dE
+\end{equation}
+if the Lyapunov exponent is zero then $c_{k0}=1$. Now there are many details I have skipped over and I have not performed the calculations perfectly and there are a few factors for the density of states that could be wrong, but it seems like that if the Loschmidt Echo takes this form then one can compute asymptotics in the large $t\gg1$.
+
+\bcomment{That is a delicate assumption here. Assuming we can parametrise the $|c_{k0}|^2$ by their energy and find the energy-dependent Lyapunov exponent, we would obtain something like $c_{0k} \sim \left(\gamma(E(k)) k\right)$}
+
+\section{First detection amplitudes} 
+z-transform Loschmidt
+\begin{align}
+    \hat{L}(z) &= \sum_{n} z^n L(n \tau) = \sum_n z^n  \sum_k \abs{c_{k0}}^2 e^{-iE_k n \tau} = 
+    \sum_k   |\abs{c_{k0}}|^2 \sum_{n=1}^{\infty} z^n E^{-i E_k n \tau} \\
+    &= \sum_k   \abs{c_{k0}}^2 \frac{z e^{-i E_k \tau}}{1-z e^{-i E_k \tau}} \approx \int \dint{k} \abs{c_{k0}}^2 \frac{z e^{-i E_k \tau}}{1-z e^{-i E_k \tau}} \\
+    & = \int_{-2-W}^{2+W} \dint{E}\underbrace{\left|\frac{\dint{k}}{\dint{E}}\right|}_{=g(E)} \abs{c_{k0}}^2 \frac{z e^{-i E \tau}}{1-z e^{-i E \tau}}
+\end{align}
+z-transform first-detection amplitudes
+\begin{align}
+    \hat{\phi}(z) &= \frac{\hat{L}(z)}{1+ \hat{L}(z)} \\
+    &= \frac{\int_{-2-W}^{2+W} \dint{E}g(E) \abs{c_{k0}}^2 \frac{z e^{-i E \tau}}{1-z e^{-i E \tau}}}{\int_{-2-W}^{2+W} \dint{E} g(E) \abs{c_{k0}}^2 \frac{1}{1-z e^{-i E \tau}}}
+\end{align}
+\textcolor{red}{Justify} Assume $|c_{k0}(E)|^2 = e^{2\gamma(E)}/L$
+then 
+\begin{align}
+    \hat{L}(z) &= \frac{1}{L}\int_{-2-W}^{2+W} \dint{E}g(E) e^{2\gamma(E)} \frac{z e^{-i E \tau}}{1-z e^{-i E \tau}}\\
+    \hat{\phi}(z) &= \frac{\int_{-2-W}^{2+W} \dint{E}g(E) e^{2\gamma(E)} \frac{z e^{-i E \tau}}{1-z e^{-i E \tau}}}{\int_{-2-W}^{2+W} \dint{E}g(E) e^{2\gamma(E)} \frac{1}{1-z e^{-i E \tau}}}
+\end{align}
+\section{Quantum Random Walk}
 \end{document}

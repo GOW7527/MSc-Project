@@ -81,7 +81,7 @@ which allows Eq.(\ref{MFPT7}) to be written as
     {\ev{\hat{D}}{\theta_n}}
     {\prod_{j=1}^{n-1}(1-P_j)}.
 \end{equation}
-Now Eq.(\ref{MFPT9}) only tells the probability of a particle existing in the state $\projection$ after $n-1$ unsuccessful measurements, it does not give the statistics for first detection on the $n$ measurements denoted by $F_n$. Consider the thought experiment of measuring the particle to be in the state $\ket{\phi}$ on the first measurement, the probability of that happening is given by $P_1$. Assume that the particle was not measured on the first measurement which occurs with probability $1-P_1$, then the first detection can occur on the second measurement with probability $F_2=(1-P_1)P_2$. If the particle is again not measured to be in the desired state on the second measurement then the probability of being detected for the first time on the third measurement is given by $F_3=(1-P_1)(1-P_2)P_3$. In general the probability of detecting the particle to be in the state $\ket{\phi}$ on the $n$th measurement is given by 
+Now Eq.(\ref{MFPT9}) only tells the probability of a particle existing in the state $\projection$ after $n-1$ unsuccessful measurements, it does not give the statistics for first detection on the $n$ measurements denoted by $F_n$. Consider the thought experiment of measuring the particle to be in the state $\ket{\phi}$ on the first measurement, the probability of that happening is given by $P_1$. Assume that the particle was not measured on the first measurement which occurs with probability $1-P_1$, then the first detection can occur on the second measurement with probability $F_2=(1-P_1)P_2$. If the particle is again not measured to be in the desired state on the second measurement then the probability of being detected for the first time on the third measurement is given by $F_3=(1-P_1)(1-P_2)P_3$. In general the probability of detecting the particle to be in the state $\state$ on the $n$th measurement is given by 
 \begin{equation}\label{MFPT10}
     F_n=(1-P_1)(1-P_2)...(1-P_{n-1})P_n.
 \end{equation}
@@ -90,11 +90,26 @@ substituting Eq.(\ref{MFPT9}) into Eq.(\ref{MFPT10})
     F_n=\ev{\hat{D}}{\theta_n}.
 \end{equation}
 Another useful quantity worth mentioning is the survival probability $S_N$, i.e. the probability that the particle is not detected in the first $N$ attempts
-\begin{equation}
+\begin{equation}\label{MFPT12}
     S_N=1-\sum_{n=1}^NF_n,
 \end{equation}
 the process is said to be recurrent if $\lim_{N\to\infty}S_N=0$.
-
+\subsection{Loschmidt Echo and First Detection Amplitudes}
+Consider the first detection amplitude given by $\varphi_n=\projection\ket{\theta_n}$, such that $F_n=\abs{\varphi_n}^2$. Using Eq.(\ref{MFPT8}) and $\varphi_1=\projection\ket{\psi_0}$ one can show by induction that $\varphi$ satisfies Eq.(\ref{MFPT13})
+\begin{equation}\label{MFPT13}
+    \varphi_n=\projection\hat{U}(n\tau)\ket{\psi_0}-\sum_{j=1}^{n-1}\varphi_j\projection\hat{U}((n-j)\tau)\state.   
+\end{equation}
+Eq.(\ref{MFPT12}) is referred to as the quantum renewal equation \cite{barkai}, which yields $\varphi_n$ in terms of a propagation free of measurement $\projection\hat{U}(n\tau)\ket{\psi_0}$; letting the initial state $\ket{\psi_0}$ to be the target state $\state$, then $\varphi_n$ can be determined by what is called the loschmidt amplitude $\mathcal{L}$.
+\\
+The Loschmidt Echo, $\abs{\mathcal{L}(t)}^2$ is defined as the probability a particle being in the same state as the initial state $\ket{\psi_0}$ after some time $t$:
+\begin{equation}
+    \abs{\mathcal{L}(t)}^2=\abs{\bra{\psi_0}\hat{U}(t)\ket{\psi_0}}^2.
+\end{equation}
+Eq.(\ref{MFPT13}) in terms of loschimdt echos is given by Eq.(\ref{MFPT14}),
+\begin{equation}\label{MFPT14}
+    \varphi_n=\mathcal{L}_n-\sum_{j=1}^{n-1}\mathcal{L}_j\mathcal{L}_{n-j}, \quad \text{where} \quad \mathcal{L}_n=\mathcal{L}(n\tau)
+\end{equation}
+\subsection{Generating Function}
 
 
 \section{Quantum Random Walk}
@@ -103,10 +118,42 @@ A quantum random walk can be described by the tight binding model which takes th
     \H=\sum_{i}\creation_{i+1}\annihilation_i+\creation_{i}\annihilation_{i+1}+\varepsilon^{}_i\creation_i\annihilation_i,
 \end{equation}
 where $\creation,\annihilation$ are the creation and annihilation operators respectively.
-A matrix representation of $\H$ can be constructed in the occupancy number basis of one particle $\ket{n}=\creation_n\ket{0}$, where $\ket{0}$ denotes the vacuum state. The matrix elements of $\H$ are given by
-\begin{equation}\label{QRW2}
-    \H_{mn}=\bra{m}\H\ket{n}
+A matrix representation of $\H$ can be constructed in the occupancy number basis of one particle $\ket{n}=\creation_n\ket{\nu}$, where $\ket{\nu}$ denotes the vacuum state. The matrix elements of $\H$ are given by
+\begin{align}\label{QRW2}
+    \H_{mn}&=\bra{m}\H\ket{n}
+    \\
+    &=\sum_i \bra{m}\creation_{i}\annihilation_{i+1}\ket{n} +\bra{m}\creation_{i+1}\annihilation_{i}\ket{n} + \varepsilon^{}_i\bra{m}\creation_{i}\annihilation_{i}\ket{n} 
+    \\
+    &= \sum_i \bra{m}\creation_{i}\delta^{}_{i+1,n}\ket{\nu}
+    +\bra{m}\creation_{i+1}\delta^{}_{i,n}\ket{\nu} +
+    \varepsilon^{}_i\bra{m}\creation_{i}\delta^{}_{i,n}\ket{\nu} 
+    \\
+    &= \bra{m}\ket{n-1}+\bra{m}\ket{n+1}+\varepsilon_n\bra{m}\ket{n}
+    \\
+    &=\delta_{m,n-1}+\delta_{m,n+1}+\varepsilon_n\delta_{m,n}, \label{QRW3}
+\end{align}
+it is far more informative to look expression \ref{QRW3} in matrix form:
+\begin{equation}
+    \mqty(
+    1 & \varepsilon_1 & 1 & 0 & 0 &\cdots 
+    \\
+    0 & 1 & \varepsilon_2 & 1 & 0&\ddots
+    \\
+    \vdots & \ddots & \ddots & \ddots  & \ddots &\ddots
+    )
 \end{equation}
+\section{Tight Binding Model}
+The tight binding model is described by Eq.(\ref{QRW1}) where $\varepsilon_i=0$, this model simply represents a particle jumping only to its neighbouring lattice site. The time evolution of the wavefunction given the initial state is 
+
+
+
+
+
+
+
+
+
+
 \section{Email}
 I have only a small comment on the analytics of the FDT provided the Loschmidt amplitude indeed becomes constant.
 
