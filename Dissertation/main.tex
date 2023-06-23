@@ -8,6 +8,8 @@
 \usepackage{esint}
 \usepackage[margin=2cm]{geometry}
 \usepackage{bbold}
+\usepackage{biblatex}
+\addbibresource{reference.bib}
 \numberwithin{equation}{section}
 \newcommand{\R}{\mathbb{R}}
 \renewcommand{\H}{\mathcal{\hat{H}}}
@@ -16,6 +18,7 @@
 \newcommand{\projection}{\bra{\phi}}
 \newcommand{\annihilation}{c^{}}
 \newcommand{\creation}{c^{\dagger}}
+\newcommand{\zphi}{\hat{\varphi}(z)}
 \title{Mean First Passage time of Quantum Processes}
 \author{G. Li}
 \date{December 2021}
@@ -50,7 +53,7 @@ Consider performing the first measurement at time $t=\tau-\varepsilon=\tau^-$ wi
 \end{equation}
 If the measurement is successful then the first detection time is $t_f=\tau$, if the measurement is not successful than $P_1=0$ at time $t=\tau+\varepsilon=\tau^+$, $\varepsilon\searrow0$, this is due to the collapse of the wave function. Assuming that the particle is not detected then the wavefunction at time $t=\tau^+$ is
 \begin{equation}\label{MFPT4}
-    \ket{\psi(\tau^+)}=N\left(\1-\state\bra{\phi} \right)\ket{\psi(\tau^-)}
+    \ket{\psi(\tau^+)}=N\biggl(\1-\state\bra{\phi} \biggr)\ket{\psi(\tau^-)}
 \end{equation}
 where the idea behind Eq.(\ref{MFPT4}) is that the particle is in the state of $\ket{\psi(\tau^-)}$ but now with zero probability that is in the state $\state$. $N$ is the normalization factor, given that prior to the measurement the probability of not being in the state $\state$ is $P_1$ then $N=1/\sqrt{1-P_1}$ such that $\braket{\psi(\tau^+)}{\psi(\tau^+)}=1$.
 \\
@@ -81,7 +84,7 @@ which allows Eq.(\ref{MFPT7}) to be written as
     {\ev{\hat{D}}{\theta_n}}
     {\prod_{j=1}^{n-1}(1-P_j)}.
 \end{equation}
-Now Eq.(\ref{MFPT9}) only tells the probability of a particle existing in the state $\projection$ after $n-1$ unsuccessful measurements, it does not give the statistics for first detection on the $n$ measurements denoted by $F_n$. Consider the thought experiment of measuring the particle to be in the state $\ket{\phi}$ on the first measurement, the probability of that happening is given by $P_1$. Assume that the particle was not measured on the first measurement which occurs with probability $1-P_1$, then the first detection can occur on the second measurement with probability $F_2=(1-P_1)P_2$. If the particle is again not measured to be in the desired state on the second measurement then the probability of being detected for the first time on the third measurement is given by $F_3=(1-P_1)(1-P_2)P_3$. In general the probability of detecting the particle to be in the state $\state$ on the $n$th measurement is given by 
+Now Eq.(\ref{MFPT9}) only tells the probability of a particle existing in the state $\projection$ after $n-1$ unsuccessful measurements, it does not give the statistics for first detection on the $n$ measurements denoted by $F_n$. Consider the thought experiment of measuring the particle to be in the state $\ket{\phi}$ on the first measurement, the probability of that happening is given by $P_1$. Assume that the particle was not measured on the first measurement which occurs with probability $1-P_1$, then the first detection can occur on the second measurement with probability $F_2=(1-P_1)P_2$. If the particle is again not measured to be in the desired state on the second measurement then the probability of being detected for the first time on the third measurement is given by $F_3=(1-P_1)(1-P_2)P_3$. In general the probability of detecting the particle to be in the state $\state$ on the $n$th measurement for the first time is given by 
 \begin{equation}\label{MFPT10}
     F_n=(1-P_1)(1-P_2)...(1-P_{n-1})P_n.
 \end{equation}
@@ -94,55 +97,88 @@ Another useful quantity worth mentioning is the survival probability $S_N$, i.e.
     S_N=1-\sum_{n=1}^NF_n,
 \end{equation}
 the process is said to be recurrent if $\lim_{N\to\infty}S_N=0$.
+
+
 \subsection{Loschmidt Echo and First Detection Amplitudes}
-Consider the first detection amplitude given by $\varphi_n=\projection\ket{\theta_n}$, such that $F_n=\abs{\varphi_n}^2$. Using Eq.(\ref{MFPT8}) and $\varphi_1=\projection\ket{\psi_0}$ one can show by induction that $\varphi$ satisfies Eq.(\ref{MFPT13})
+Consider the first detection amplitude given by $\varphi_n=\projection\ket{\theta_n}$, such that $F_n=\abs{\varphi_n}^2$. Using Eq.(\ref{MFPT8}) and $\varphi_1=\projection\ket{\psi_0}$ one can show by induction that $\varphi_n$ can be computed by Eq.(\ref{MFPT13}), also known as the quantum renewal equations\cite{barkai}.
 \begin{equation}\label{MFPT13}
     \varphi_n=\projection\hat{U}(n\tau)\ket{\psi_0}-\sum_{j=1}^{n-1}\varphi_j\projection\hat{U}((n-j)\tau)\state.   
 \end{equation}
-Eq.(\ref{MFPT12}) is referred to as the quantum renewal equation \cite{barkai}, which yields $\varphi_n$ in terms of a propagation free of measurement $\projection\hat{U}(n\tau)\ket{\psi_0}$; letting the initial state $\ket{\psi_0}$ to be the target state $\state$, then $\varphi_n$ can be determined by what is called the loschmidt amplitude $\mathcal{L}$.
+Eq.(\ref{MFPT13}) is of particular importance because it yields $\varphi_n$ in terms of a propagation free of measurement $\projection\hat{U}(n\tau)\ket{\psi_0}$; letting the initial state $\ket{\psi_0}$ to be the target state $\state$, then $\varphi_n$ can be determined by what is called the Loschmidt amplitude $\mathcal{L}$.
 \\
 The Loschmidt Echo, $\abs{\mathcal{L}(t)}^2$ is defined as the probability a particle being in the same state as the initial state $\ket{\psi_0}$ after some time $t$:
-\begin{equation}
+\begin{equation}\label{MFPT14}
     \abs{\mathcal{L}(t)}^2=\abs{\bra{\psi_0}\hat{U}(t)\ket{\psi_0}}^2.
 \end{equation}
-Eq.(\ref{MFPT13}) in terms of loschimdt echos is given by Eq.(\ref{MFPT14}),
-\begin{equation}\label{MFPT14}
-    \varphi_n=\mathcal{L}_n-\sum_{j=1}^{n-1}\mathcal{L}_j\mathcal{L}_{n-j}, \quad \text{where} \quad \mathcal{L}_n=\mathcal{L}(n\tau)
+Eq.(\ref{MFPT13}) in terms of Loschmidt echos is given by Eq.(\ref{MFPT15}),
+\begin{equation}\label{MFPT15}
+    \varphi_n=\mathcal{L}_n-\sum_{j=1}^{n-1}\varphi_j\mathcal{L}_{n-j}, \quad \text{where} \quad \mathcal{L}_n=\mathcal{L}(n\tau)
 \end{equation}
 \subsection{Generating Function}
+Consider the $Z$ transform of $\varphi_n$ defined by
+\begin{equation}\label{MFPT16}
+    \zphi=\mathcal{Z}[\varphi_n]=\sum_{n=1}^\infty z^{n}\varphi_n
+\end{equation}
+substituting Eq.(\ref{MFPT15}) into Eq.(\ref{MFPT16}) one obtains 
+\begin{align}
+\zphi&=\sum_{n=1}^\infty z^{n}\mathcal{L}_n-\sum_{n=1}^{\infty}z^{n}\sum_{j=1}^{n-1}\varphi_j\mathcal{L}_{n-j}
+\\
+&=\sum_{n=1}^\infty z^{n}\mathcal{L}_n-\sum_{n=1}^{\infty}z^{n}(\varphi * \mathcal{L})_n
+\\
+&=I(z)-\zphi I(z), \quad \text{where} \quad I(z)=\mathcal{Z}[\mathcal{L}_n] \label{MFPT19}
+\end{align}
+re-arranging one obtains the generating function for $\varphi_n$:
+\begin{equation}\label{MFPT20}
+    \zphi=\frac{I(z)}{1+I(z)}
+\end{equation}
+On line (\ref{MFPT19}) the convolution property of the $Z$ transform\footnote{ $\mathcal{Z} [(x * y)_n]=\mathcal{Z}[x_n]\mathcal{Z}[y_n]$, \text{the symbol $*$ denotes a convolution: $(x*y)_n=\sum_k x_k y_{n-k}$}} was used.
+\\
+To obtain $\varphi_n$ from $\zphi$ one can simply use the inversion formulas of the $Z$ transform
+\begin{equation}
+    \varphi_n=\frac{1}{n!}\dv[n]{z}\zphi\eval_{z=0}
+\end{equation}
+or by the Cauchy Residue theorem
+\begin{equation}
+    \varphi_n=\frac{1}{2\pi i}\oint_C \zphi z^{-n-1} \dd{z}
+\end{equation}
+where $C$ is a counterclockwise path that contains the origin and is entirely within the radius of convergence of $\zphi$.
 
 
 \section{Quantum Random Walk}
-A quantum random walk can be described by the tight binding model which takes the form of Eq.(\ref{QRW1}) in the second quantization formalism
+A quantum random walk can be described by using a Hamiltonian $\H$ of the form given by Eq.(\ref{QRW1}), where $\{\gamma\}$ are the hopping rate between lattice sites and $\{\varepsilon\}$ are the onsite potential energies.
 \begin{equation}\label{QRW1}
-    \H=\sum_{i}\creation_{i+1}\annihilation_i+\creation_{i}\annihilation_{i+1}+\varepsilon^{}_i\creation_i\annihilation_i,
+    \H=\sum_{i}\gamma^{}_i(\creation_{i+1}\annihilation_i+\creation_{i}\annihilation_{i+1})+\varepsilon^{}_i\creation_i\annihilation_i,
 \end{equation}
 where $\creation,\annihilation$ are the creation and annihilation operators respectively.
 A matrix representation of $\H$ can be constructed in the occupancy number basis of one particle $\ket{n}=\creation_n\ket{\nu}$, where $\ket{\nu}$ denotes the vacuum state. The matrix elements of $\H$ are given by
 \begin{align}\label{QRW2}
     \H_{mn}&=\bra{m}\H\ket{n}
     \\
-    &=\sum_i \bra{m}\creation_{i}\annihilation_{i+1}\ket{n} +\bra{m}\creation_{i+1}\annihilation_{i}\ket{n} + \varepsilon^{}_i\bra{m}\creation_{i}\annihilation_{i}\ket{n} 
+    &=\sum_i \gamma_i\bra{m}\creation_{i}\annihilation_{i+1}\ket{n} +\gamma_i\bra{m}\creation_{i+1}\annihilation_{i}\ket{n} + \varepsilon^{}_i\bra{m}\creation_{i}\annihilation_{i}\ket{n} 
     \\
-    &= \sum_i \bra{m}\creation_{i}\delta^{}_{i+1,n}\ket{\nu}
-    +\bra{m}\creation_{i+1}\delta^{}_{i,n}\ket{\nu} +
+    &= \sum_i \gamma_i\bra{m}\creation_{i}\delta^{}_{i+1,n}\ket{\nu}
+    +\gamma_i\bra{m}\creation_{i+1}\delta^{}_{i,n}\ket{\nu} +
     \varepsilon^{}_i\bra{m}\creation_{i}\delta^{}_{i,n}\ket{\nu} 
     \\
-    &= \bra{m}\ket{n-1}+\bra{m}\ket{n+1}+\varepsilon_n\bra{m}\ket{n}
+    &= \gamma_{n-1}\bra{m}\ket{n-1}+\gamma_{n+1}\bra{m}\ket{n+1}+\varepsilon_n\bra{m}\ket{n}
     \\
-    &=\delta_{m,n-1}+\delta_{m,n+1}+\varepsilon_n\delta_{m,n}, \label{QRW3}
+    &=\gamma_{n-1}\delta_{m,n-1}+\gamma_{n+1}\delta_{m,n+1}+\varepsilon_n\delta_{m,n}, \label{QRW3}
 \end{align}
-it is far more informative to look expression \ref{QRW3} in matrix form:
+it is far more informative to look expression (\ref{QRW3}) in matrix form:
 \begin{equation}
     \mqty(
-    1 & \varepsilon_1 & 1 & 0 & 0 &\cdots 
+    \gamma_1 & \varepsilon_1 & \gamma_1 & 0 & 0 &\cdots 
     \\
-    0 & 1 & \varepsilon_2 & 1 & 0&\ddots
+    0 & \gamma_2 & \varepsilon_2 & \gamma_2 & 0&\ddots
     \\
     \vdots & \ddots & \ddots & \ddots  & \ddots &\ddots
     )
 \end{equation}
 \section{Tight Binding Model}
+The simplest model of the quantum random walk is given by Eq.(\ref{QRW1}) where $\varepsilon_i=0$ and $\gamma_i=1$, this model simply represents a particle jumping only to its neighbouring lattice site with equal probability.
+
+
+
 The tight binding model is described by Eq.(\ref{QRW1}) where $\varepsilon_i=0$, this model simply represents a particle jumping only to its neighbouring lattice site. The time evolution of the wavefunction given the initial state is 
 
 
@@ -188,4 +224,5 @@ and then the Loschmidt echo should go like
 $$4 \sin^2(W \tau) \tau^{-2}$$
 
 It doesn’t really work with the plots you showed me though, as there the terms go against a constant for large $\tau.$ I’d be curious though if the oscillations are somehow well captured by the $\sin^2(W \tau)$ term? Or does it not work at all? Is there something like a constant offset?
+\printbibliography  
 \end{document}
