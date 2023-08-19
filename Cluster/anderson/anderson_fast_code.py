@@ -6,7 +6,7 @@ import h5py
 import argparse
 #Paths
 path=os.getcwd()
-path=os.path.join(path,'data_19_05')
+path=os.path.join(path,'data_19/05')
 #Model
 class anderson():
     def __init__(self,energy):

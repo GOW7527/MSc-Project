@@ -1,4 +1,5 @@
-\documentclass{article}
+\documentclass[12pt]{article}
+\linespread{1.5}
 \usepackage[utf8]{inputenc}
 \usepackage{braket}
 \usepackage{amsmath}
@@ -8,15 +9,33 @@
 \usepackage{esint}
 \usepackage[margin=2cm]{geometry}
 \usepackage{bbold}
+\usepackage[sorting=none]{biblatex}
+\addbibresource{reference.bib}
 \numberwithin{equation}{section}
 \newcommand{\R}{\mathbb{R}}
 \renewcommand{\H}{\mathcal{\hat{H}}}
 \newcommand{\1}{\mathbb{1}}
-\newcommand{\state}{\ket{\phi}}
-\newcommand{\projection}{\bra{\phi}}
+\newcommand{\state}{\ket{\psi_T}}
+\newcommand{\projection}{\bra{\psi_T}}
 \newcommand{\annihilation}{c^{}}
 \newcommand{\creation}{c^{\dagger}}
-\title{Mean First Passage time of Quantum Processes}
+\newcommand{\zphi}{\hat{\varphi}(z)}
+\newcommand{\Lz}{\hat{\mathcal{L}}(z)}
+\newcommand{\tb}{\H_{tb}}
+\newcommand{\vanhove}{E^*_l}
+\newcommand{\Lvanhove}{\Lambda^*_l}
+% % 
+% \usepackage[inline]{showlabels} % print labels in margin
+% \usepackage[unicode,
+%   colorlinks = true,
+%             linkcolor = blue,
+%             urlcolor  = blue,
+%             citecolor = blue,
+%             anchorcolor = blue,
+%     filecolor=blue]{hyperref}
+% %
+\usepackage[inline]{showlabels}
+\title{First Detected Return Time of a Fermion in the Disordered Anderson Tight-Binding Model}
 \author{G. Li}
 \date{December 2021}
 \begin{document}
@@ -28,85 +47,552 @@
 \newpage
 \tableofcontents
 \newpage
-\section{First Detection Time}
-The dynamics of a quantum particle differs from that of a classical particle in many forms but the biggest difference arises in the measurement process. 
-\\
-\\
-\\
-\\
-Justification of measurements at a a sampling rate $\tau$. 
-\\\\
-The time evolution of a particle is defined by the Schroedinger's equation, Eq.(\ref{MFPT1}).
-\begin{equation}\label{MFPT1}
-    i\partial_t\ket{\psi}=\H\ket{\psi}
+
+
+
+\section{Introduction}
+The first passage time problem is a fascinating topic that determines the probability distribution of a stochastic process reaches a specific state the first time. It finds applications in various fields such as physics, biology, and finance \cite{redner_first-passage_2001}.
+
+In classical systems, a common example is studying the first time a random walker, initially positioned at the origin; reaches a particular lattice site. However, when it comes to quantum mechanics, the first passage time problem becomes ill-defined due to the inherent nature of quantum dynamics and measurement effects \cite{quantum_griffiths}.
+
+In quantum mechanics, the act of measuring a quantum state alters its dynamics. 
+\textbf{add an example}
+
+Consider a quantum random walker situated at an arbitrary lattice site attempting to reach the origin. The continuous measurement of the walker's position effectively freezes its movement, preventing quantum evolution. This phenomenon is known as the quantum Zeno effect \cite{zeno}.
+
+To circumvent this problem one might build a device capable of measuring the arrival time for a system to reach a specific quantum state. However, research has shown that no such device can exist \cite{arrival_time}.
+
+Given that it is impossible to find a precise time of reaching a particular state due to to the nature of quantum mechanics one can shift its focus to understanding when the target state is detected for the first time using a stroboscopic measurement protocol. This protocol involves performing a projective measurement at a frequency $1/\tau$ and determining what the probability that the system is detected for the first time $F_n$ in the target state on the $n$-the measurement. This setup has already been considered in \cite{grunbaum_recurrence_2013,krovi_hitting_2006,dhar_quantum_2015} and has found interest in quantum computing in particular finding when the computational results of a quantum computer become available for the first time \cite{grover_quantum_1997,noauthor_one-dimensional_nodate,aaronson_quantum_2005}. Another rapidly forming field of interest is related to measurement induced phase transitions \cite{Skinner_2019} and dynamical quantum phase transitions \cite{Heyl_2018}. An interesting question to ask is when are phase transitions detected for the first time.
+
+The simplest toy model that has been studied using the stroboscopic measurement is the tight binding model \cite{barkai}, which models a quantum analogue of the classical random walk. The first detection statistics of a sequentially and periodically perturbed ring has recently been studied \cite{wang2023quantum}, the goal of this project is be to extend the study to the unbounded system and generalize the perturbation to disorder. To accomplish this, the focus will be on the Anderson model, which has been extensively research over the past 50 years for its localization properties \cite{50_localization}. In the Anderson model, a particle hops on a lattice with the onsite energies randomly sampled from a uniform distribution.
+The specific objective is to investigate the probability distribution of the first time a particle is detected to have returned to its initial state in the Anderson tight binding model. 
+
+
+
+
+\section{Stroboscopic measurement protocol}\label{sec:stroboscopic_measurement_protocol}
+This section introduces the reader to the stroboscopic measurement protocol which follows very closely to the chain of reasoning and convention used in \cite{barkai,wang2023quantum,}.
+The time evolution of a particle is governed by the Schrödinger equation,
+\begin{equation}\label{eq:schrodinger}
+    i\partial_t\ket{\psi}=\H\ket{\psi}.
 \end{equation}
-The solution to Eq.(\ref{MFPT1}) is given by Eq.(\ref{MFPT2}).
-\begin{equation}\label{MFPT2}
-\ket{\psi(t)}=e^{-i\H t}\ket{\psi_0}=\hat{U}(t)\ket{\psi_0}, \quad \text{where} \quad {\ket{\psi_0}}\quad \text{is the initial state}
+The formal solution to Eq.~(\ref{eq:schrodinger}) is given by
+\begin{equation}\label{eq:sol_schrodinger}
+\ket{\psi(t)}=e^{-i\H t}\ket{\psi_0}=\hat{U}(t)\ket{\psi_0}, 
 \end{equation}
-Consider performing the first measurement at time $t=\tau-\varepsilon=\tau^-$ with $\varepsilon\searrow0$, the probability of measuring the particle in a state $\state$ is 
-\begin{equation}\label{MFPT3}
+where $\ket{\psi_0}$ is the initial state. Consider performing the first projective measurement by overlapping the target state $\state$ with the wavefunction $\ket{\psi(t)}$ at time $t=\tau-\varepsilon=\tau^-$ with $\varepsilon\searrow0$, the probability of measuring the particle in a state $\state$ is 
+\begin{equation}
     P_1=\abs{\projection\ket{\psi(\tau^-)}}^2
 \end{equation}
-If the measurement is successful then the first detection time is $t_f=\tau$, if the measurement is not successful than $P_1=0$ at time $t=\tau+\varepsilon=\tau^+$, $\varepsilon\searrow0$, this is due to the collapse of the wave function. Assuming that the particle is not detected then the wavefunction at time $t=\tau^+$ is
-\begin{equation}\label{MFPT4}
-    \ket{\psi(\tau^+)}=N\left(\1-\state\bra{\phi} \right)\ket{\psi(\tau^-)}
+If the measurement is successful then the first detection time is $t_f=\tau$. If the measurement is not successful then $\projection\ket{\psi(\tau^+)}=0$, where $\tau^+=\tau+\varepsilon$, $\varepsilon\searrow0$, this is due to the collapse of the wave function. Assuming that the particle is not detected then the wavefunction at time $t=\tau^+$ is
+\begin{equation}\label{eq:survival_wvf}
+    \ket{\psi(\tau^+)}=N\biggl(\1-\state\bra{\phi} \biggr)\ket{\psi(\tau^-)},
 \end{equation}
-where the idea behind Eq.(\ref{MFPT4}) is that the particle is in the state of $\ket{\psi(\tau^-)}$ but now with zero probability that is in the state $\state$. $N$ is the normalization factor, given that prior to the measurement the probability of not being in the state $\state$ is $P_1$ then $N=1/\sqrt{1-P_1}$ such that $\braket{\psi(\tau^+)}{\psi(\tau^+)}=1$.
+where the idea behind Eq.~(\ref{eq:survival_wvf}) is that the wavefunction is projected to a subspace without \textbf{improve this, understand carefully the eqn.}
+
+is that the particle is in the state of $\ket{\psi(\tau^-)}$ but now with zero probability that is in the state $\state$. $N$ is the normalization factor, given that prior to the measurement the probability of not being in the state $\state$ is $P_1$ then $N=1/\sqrt{1-P_1}$ such that $\braket{\psi(\tau^+)}{\psi(\tau^+)}=1$.
 \\
-For the second measurement the procedure is very similar to the previous one, the probability of finding the particle in the state $\state$ conditioned that the first measurement is not successful is given by
-\begin{equation}\label{MFPT5}
+For the second measurement the procedure is very similar to the previous one; the probability of finding the particle in the state $\state$ conditioned that the first measurement is not successful is given by
+\begin{equation}\label{eq:prob_conditioned_fail}
     P_2=\projection \hat{U}(\tau)\ket{\psi(\tau^+)}=\projection\ket{\psi(2\tau^-)}.
 \end{equation}
-Substituting Eq.(\ref{MFPT4}) into Eq.(\ref{MFPT5}) one obtains
-\begin{equation}\label{MFPT6}
-    P_2=\frac{\abs{\projection\hat{U}(\tau)(1-\hat{D})\hat{U}(\tau)\ket{\psi_0}}^2}{1-P_1}, \quad \text{where}\quad \hat{D}=\state\projection \quad \text{is defined as the projection operator.}
+Substituting Eq.(\ref{eq:survival_wvf}) into Eq.(\ref{eq:prob_conditioned_fail}) one obtains
+\begin{equation}
+    P_2=\frac{\abs{\projection\hat{U}(\tau)(1-\hat{D})\hat{U}(\tau)\ket{\psi_0}}^2}{1-P_1},
 \end{equation}
-This process iterated $n$ times yields the probability $P_n$ that a measurement is successful given $n-1$ null measurements
-\begin{equation}\label{MFPT7}
+where $\hat{D}=\state\projection$ is defined as the projection operator.
+This process iterated $n$ times yields the probability $P_n$ that a measurement is successful given $n-1$ unsuccessful measurements
+\begin{equation}\label{eq:prob_conditioned_fail_n}
     P_n=\frac
     %numerator
     {\abs
     {\projection \left[\hat{U}(\tau)(\1-\hat{D})\right]^{n-1}\hat{U}(\tau)\ket{\psi_0}}}
     %Denominator
-    {(1-P_1)(1-P_{n-1})}.
+    {(1-P_{n-1})}.
 \end{equation}
 One can define the first detection wave function as
-\begin{equation}\label{MFPT8}
+\begin{equation}\label{eq:first_det_wvf}
     \ket{\theta_n}=\hat{U}(\tau)\left[(\1-\hat{D})\hat{U}(\tau)\right]^{n-1}\ket{\psi_0}
 \end{equation}
-which allows Eq.(\ref{MFPT7}) to be written as
-\begin{equation}\label{MFPT9}
+which allows Eq.(\ref{eq:prob_conditioned_fail_n}) to be written as
+\begin{equation}\label{eq:prob_existing}
     P_n=\frac
     {\ev{\hat{D}}{\theta_n}}
     {\prod_{j=1}^{n-1}(1-P_j)}.
 \end{equation}
-Now Eq.(\ref{MFPT9}) only tells the probability of a particle existing in the state $\projection$ after $n-1$ unsuccessful measurements, it does not give the statistics for first detection on the $n$ measurements denoted by $F_n$. Consider the thought experiment of measuring the particle to be in the state $\ket{\phi}$ on the first measurement, the probability of that happening is given by $P_1$. Assume that the particle was not measured on the first measurement which occurs with probability $1-P_1$, then the first detection can occur on the second measurement with probability $F_2=(1-P_1)P_2$. If the particle is again not measured to be in the desired state on the second measurement then the probability of being detected for the first time on the third measurement is given by $F_3=(1-P_1)(1-P_2)P_3$. In general the probability of detecting the particle to be in the state $\ket{\phi}$ on the $n$th measurement is given by 
-\begin{equation}\label{MFPT10}
+Now Eq.~(\ref{eq:prob_existing}) only states the probability of a particle existing in the state $\projection$ after $n-1$ unsuccessful measurements; It does not give the statistics for first detection on the $n$ measurements denoted by $F_n$. Consider the thought experiment of measuring the particle to be in the state $\ket{\phi}$ on the first measurement, the probability of that happening is given by $P_1$. Assume that the particle was not measured on the first measurement which occurs with probability $1-P_1$, then the first detection can occur on the second measurement with probability $F_2=(1-P_1)P_2$. If the particle is again not measured to be in the desired state on the second measurement then the probability of being detected for the first time on the third measurement is given by $F_3=(1-P_1)(1-P_2)P_3$. In general the probability of detecting the particle to be in the state $\state$ on the $n$th measurement for the first time is given by 
+\begin{equation}\label{eq:first_detection}
     F_n=(1-P_1)(1-P_2)...(1-P_{n-1})P_n.
 \end{equation}
-substituting Eq.(\ref{MFPT9}) into Eq.(\ref{MFPT10}) 
-\begin{equation}\label{MFPT11}
+Substituting Eq.~(\ref{eq:prob_existing}) into Eq.~(\ref{eq:first_detection}), one obtains
+\begin{equation}
     F_n=\ev{\hat{D}}{\theta_n}.
 \end{equation}
 Another useful quantity worth mentioning is the survival probability $S_N$, i.e. the probability that the particle is not detected in the first $N$ attempts
 \begin{equation}
-    S_N=1-\sum_{n=1}^NF_n,
+    S_N=1-\sum_{n=1}^NF_n.
 \end{equation}
-the process is said to be recurrent if $\lim_{N\to\infty}S_N=0$.
+The process is said to be recurrent if $\lim_{N\to\infty}S_N=0$.
+
+
+
+
+
+
+
+\subsection{Loschmidt Echo and First Detection Amplitudes}
+Consider the first detection amplitude given by $\varphi_n=\projection\ket{\theta_n}$, such that $F_n=\abs{\varphi_n}^2$. Using Eq.(\ref{eq:first_det_wvf}) and $\varphi_1=\projection\ket{\psi_0}$, one can show by induction that $\varphi_n$ can be computed by Eq.(\ref{eq:quantum_renewal}), also known as the quantum renewal equations \cite{barkai},
+\begin{equation}\label{eq:quantum_renewal}
+    \varphi_n=\projection\hat{U}(n\tau)\ket{\psi_0}-\sum_{j=1}^{n-1}\varphi_j\projection\hat{U}((n-j)\tau)\state.   
+\end{equation}
+Eq.(\ref{eq:quantum_renewal}) is of particular importance because it yields $\varphi_n$ in terms of a propagation free of measurement $\projection\hat{U}(n\tau)\ket{\psi_0}$; letting the initial state $\ket{\psi_0}$ to be the target state $\state$, then $\varphi_n$ can be determined by what is called the Loschmidt amplitude $\mathcal{L}$.
+\\
+The Loschmidt Echo, $\abs{\mathcal{L}(t)}^2$ is defined as the probability a particle being in the same state as the initial state $\ket{\psi_0}$ after some time $t$:
+\begin{equation}\label{eq:loschmidt_amplitude}
+    \abs{\mathcal{L}(t)}^2=\abs{\bra{\psi_0}\hat{U}(t)\ket{\psi_0}}^2.
+\end{equation}
+Eq.(\ref{eq:quantum_renewal}) in terms of Loschmidt echos is given by Eq.(\ref{eq:loschimdt_quantum_renewal}),
+\begin{equation}\label{eq:loschimdt_quantum_renewal}
+    \varphi_n=\mathcal{L}_n-\sum_{j=1}^{n-1}\varphi_j\mathcal{L}_{n-j}, \quad \text{where} \quad \mathcal{L}_n=\mathcal{L}(n\tau).
+\end{equation}
+It is also useful to clarify how one would compute the Loschmidt Amplitude using Eq.~(\ref{eq:loschmidt_amplitude}), let $\ket{v_k}$ be the eigenstates of $\H$, and $E_k$ be the energy levels, then the initial condition $\ket{\psi_0}$ can be written as a linear combination of the eigenstates:
+\begin{equation}\label{eq:psi0_expansion}
+    \ket{\psi_0}=\sum_k a_k \ket{v_k},
+\end{equation}
+where 
+\begin{equation}
+    a_k=\braket{v_k}{\psi_0}.
+\end{equation}
+Substituting Eq.~(\ref{eq:psi0_expansion}) into Eq~(\ref{eq:loschmidt_amplitude}) one obtains
+\begin{align}
+    \bra{\psi_0}e^{-i\H t}\ket{\psi_0}&=\sum_{j,k} a_j a_k e^{-iE_kt}\braket{v_j}{v_k},
+    \\
+    &=\sum_{j,k} a_j a_k e^{-iE_kt}\delta_{jk},
+    \\
+    &=\sum_k \abs{a_k}^2 e^{-iE_kt}. \label{eq:loschmidt_amplitude_practice}
+\end{align}
+\subsection{Generating Function}
+Consider the $Z$ transform of $\varphi_n$ defined by
+\begin{equation}\label{eq:generating_phi}
+    \zphi=\mathcal{Z}[\varphi_n]=\sum_{n=1}^\infty z^{n}\varphi_n.
+\end{equation}
+Substituting Eq.(\ref{eq:loschimdt_quantum_renewal}) into Eq.(\ref{eq:generating_phi}) one obtains 
+\begin{align}
+\zphi&=\sum_{n=1}^\infty z^{n}\mathcal{L}_n-\sum_{n=1}^{\infty}z^{n}\sum_{j=1}^{n-1}\varphi_j\mathcal{L}_{n-j}
+\\
+&=\sum_{n=1}^\infty z^{n}\mathcal{L}_n-\sum_{n=1}^{\infty}z^{n}(\varphi * \mathcal{L})_n
+\\
+&=I(z)-\zphi I(z),  \label{eq:z_trans_conv}
+\end{align}
+where $I(z)=\mathcal{Z}[\mathcal{L}_n]$.
+Re-arranging one obtains the generating function for $\varphi_n$:
+\begin{equation}
+    \zphi=\frac{I(z)}{1+I(z)}.
+\end{equation}
+On line (\ref{eq:z_trans_conv}) the convolution property of the $Z$ transform\footnote{ $\mathcal{Z} [(x * y)_n]=\mathcal{Z}[x_n]\mathcal{Z}[y_n]$, \text{the symbol $*$ denotes a convolution: $(x*y)_n=\sum_k x_k y_{n-k}$}} was used. One can slightly modify the expression using the fact that $\mathcal{L}_0=\braket{\psi_0}=1$:
+\begin{align}
+    \zphi&=\frac{I(z)}{1+I(z)},
+    \\
+    &=\frac{I(z)+1-1}{1+I(z)},
+    \\
+    &=1-\frac{1}{1+I(z)},
+    \\
+    &=1-\frac{1}{\Lz}, 
+\end{align}
+where
+\begin{equation}
+\Lz=\sum_{n=0}^{\infty} z^n\mathcal{L}_n. \label{eq:modified_z_loschmidt}
+\end{equation}
+\\
+To obtain $\varphi_n$ from $\zphi$ one can use the inversion formulas of the $Z$ transform
+\begin{equation}
+    \varphi_n=\frac{1}{n!}\dv[n]{z}\zphi\eval_{z=0},
+\end{equation}
+or by the Cauchy Residue theorem
+\begin{equation}
+    \varphi_n=\frac{1}{2\pi i}\oint_C \zphi z^{-n-1} \dd{z}.
+\end{equation}
+where $C$ is a counterclockwise path that contains the origin and is entirely within the radius of convergence of $\zphi$. By parametrizing the path with $z=e^{i\lambda},\lambda\in[0,2\pi]$ one obtains
+\begin{align}
+    \varphi_n&=\frac{1}{2\pi i}\oint_C \zphi z^{-n-1} \dd{z},
+    \\
+    &= \frac{1}{2\pi}\int_0^{2\pi} e^{-in\lambda}\left(1-\frac{1}{\hat{\mathcal{L}}(e^{i\lambda})}\right)\dd \lambda. \label{eq: fourier_phi}
+\end{align}
+From Eq.~(\ref{eq: fourier_phi}) $\varphi_n$ can be seen as the Fourier coefficients of $1-1/\hat{\mathcal{L}}(e^{i\lambda})$.
+\subsection{Spectral Dimension}\label{sec:spectral_dimension}
+The generating function gives an exact analytical approach to calculate $\varphi_n$ provided that $\Lz$ can be found in closed form. This section provides the minimum necessary tools to obtain the asymptotic behaviour of $\varphi_n$, many of the details and proofs are omitted but a general outline of the ideas are presented, in particular it will be shown that the behaviour of the Van-Hove singularities controls the decay rate of $\varphi_n$. The full details can be found in Ref.~\cite{Thiel_2018}.
+\\
+Consider Eq.~(\ref{eq:loschmidt_amplitude_practice}), the summation can be turned into an integral:
+\begin{equation}
+    \mathcal{L}_n=\int_{-\infty}^{\infty} f(E)e^{-iEn\tau} \dd E. \label{eq:amplitude_fourier_transform}
+\end{equation}
+The equation can be seen as the Fourier Transform of $f(E)$,
+where $f(E)$ is known as the measurement spectral density of states or in the mathematical literature as the Hamiltonian's spectral measure associated to the state $\ket{\psi_0}$ \cite{marchetti2012asymptotic}. 
+The density of states is defined as 
+\begin{equation}
+    \rho(E)=\frac{1}{N}\sum^{N}_k \delta(E-E_k),
+\end{equation}
+whereas $f(E)$ is defined as 
+\begin{equation}
+    f(E)=\frac{1}{N}\sum_k^{N} \abs{a_k}^2 \delta(E-E_k). 
+\end{equation}
+The key difference between $f(E)$ and $\rho(E)$ is that in the density of states knowledge about the initial state is not encoded in the expression. In most situations one finds that $f(E)=\rho(E)$, but it is important to note that they are not always the same. Assume that in the thermodynamic limit $N\to\infty$, $f(E)$ approaches some function which inherits the Van-Hove singularities of $\rho(E)$, then $f(E)$ admits an asymptotic expansion of the form 
+\begin{equation}
+    f(\vanhove\pm \varepsilon)\sim \Tilde{f}_l(\pm\varepsilon)+ A_l^{\pm} \varepsilon^{s/2-1},
+\end{equation}
+where $\vanhove$ is the singular point, $s$ is the spectral dimension and $\Tilde{f}_l(\pm\varepsilon)$ represents the regular part of $f(E)$ around the singularity:
+\begin{equation}
+    \Tilde{f}_l(\pm\varepsilon)=\sum_{n<s/2-1} \frac{f^{(n)}(\vanhove)}{n!}(\pm\varepsilon)^{n}.
+\end{equation}
+Substituting Eq.~(\ref{eq:amplitude_fourier_transform}) into Eq.~(\ref{eq:modified_z_loschmidt}) one obtains an expression for the Z transform of Loschmidt Amplitude in terms of $f(E)$:
+\begin{align}
+    \Lz&=\sum_{n=0}^\infty \mathcal{L}_n z^{n}
+    \\
+    &=\sum_{n=0}^\infty \int_{-\infty}^{\infty}f(E)e^{-iEn\tau}z^n \dd E
+    \\
+    &=\int_{-\infty}^\infty\sum_{n=0}^\infty \left(e^{-iEn\tau}z\right)^n f(E)\dd E
+    \\
+    &=\int_{-\infty}^{\infty} \frac{1}{1-ze^{-iE\tau}}f(E)\dd E. \label{eq:z_loschmidt_fe}
+\end{align}
+By making a change of variable $\lambda=E\tau$ one obtains 
+\begin{equation}
+    \Lz=\frac{1}{2\pi}\int_0^{2\pi}\frac{u(\lambda)}{1-ze^{i\lambda}} \dd\lambda,
+\end{equation}
+where 
+\begin{equation}
+    u(\lambda)=\frac{2\pi}{\tau}\sum_{m=-\infty}^{\infty}f\left([\lambda+2\pi m]/\tau\right).
+\end{equation}
+The singularities $\vanhove$ are then mapped to $\Lvanhove$:
+\begin{equation}
+    \Lvanhove=\vanhove\tau\mod 2\pi.
+\end{equation}
+This means that $\Lz$ inherits the Van-Hove singularities 
+\begin{equation}
+    \hat{\mathcal{L}}\left(e^{i(\Lvanhove\pm\varepsilon)}\right)\sim \Tilde{\mathcal{L}}_l (\pm \varepsilon) +B_l^{\pm}\varepsilon^{s/2-1}. \label{eq:z_loschmidt_expansion}
+\end{equation}
+Again the detailed proof of this can be found in Ref.~\cite{Thiel_2018}.
+From Eq.~(\ref{eq:z_loschmidt_expansion}) it is clear that $\zphi$ inherits the singular behaviour:
+\begin{equation}
+    \hat{\varphi}(e^{i(\Lvanhove\pm\varepsilon)})\sim 1-\frac{1}{\Tilde{\mathcal{L}}_l (\pm \varepsilon) +B_l^{\pm}\varepsilon^{s/2-1}}. \label{eq:z_phi_step}
+\end{equation}
+Depending on the value of $s$ the behaviour in the denominator changes this is because for $s<2$ the regular part $\Tilde{\mathcal{L}}=0$, hence Eq.~(\ref{eq:z_phi_step}) simplifies to 
+\begin{equation}
+    \hat{\varphi}(e^{i(\Lvanhove\pm\varepsilon)})\sim 
+    \begin{cases}
+        1-\frac{\varepsilon^{1-s/2}}{B_l^{\pm}}, & s<2\\
+        \Tilde{\varphi}_l (\pm\varepsilon)+\frac{B_l^{\pm}}{\left[\hat{\mathcal{L}}(e^{i\Lvanhove})\right]^2}, &s>2, 
+    \end{cases}
+\end{equation}
+where $\hat{\mathcal{L}}(e^{i\Lvanhove})$ is a convergent series for $s>2$
+\begin{equation}
+    \hat{\mathcal{L}}(e^{i\Lvanhove})=\sum_{n=0}\mathcal{L}_n
+\end{equation}
+As previously mentioned $\varphi_n$ are the fourier coefficients of $\zphi$, this allows the use of the Fourier Tauberian theorem. From Refs.\cite{erdélyi1956asymptotic,Gamkrelidze1989-0} the large behaviour of the Fourier coefficients of $\zphi$ are tdetermined by the singular points. In general assume that $h(x)$ has $L$ singularities at $x^*_l$ each adimitting an expansion of the form:
+\begin{equation}
+    h(x_l^*\pm\varepsilon)\sim \Tilde{h}_l(\pm\varepsilon)+H_l^{\pm}\varepsilon^{\nu-1}
+\end{equation}
+then its Fourier coefficients for large $n$ behave like 
+\begin{equation}
+    \frac{1}{2\pi}\int_0^{2\pi}e^{inx}h(x)\sim\frac{\Gamma(\nu)}{2\pi n^{\nu}}\sum_{l=0}^{L-1}e^{-inx_l^*}\left[\frac{H^+_l}{i^{\nu}}+\frac{H_l^-}{(-i)^\nu}\right].
+\end{equation}
+Since $\hat{\varphi}(e^{i\lambda})$ admits an expansion of that form, then the Fourier Tauberian formula can be applied to obtain
+\begin{equation} \label{eq:phi_asymptotic}
+    \varphi_n\sim \sum_{l=0}^{L-1}e^{-in\Lvanhove}\times
+    \begin{cases}
+        \frac{\Gamma(2-s/2)}{n^{2-s/2}}\left[\frac{i^{s/2}}{B_l^+}+\frac{(-i)^{s/2}}{B_l^-}\right], & s<2
+        \\
+        \frac{\Gamma(s/2)}{[\hat{\mathcal{L}}(e^{i\Lvanhove})]^2n^{s/2}}\left[\frac{B_l^+}{i^{s/2}}+\frac{B_l^-}{(-i)^{s/2}}\right], & s>2.
+    \end{cases} 
+\end{equation}
+To use Eq.~(\ref{eq:phi_asymptotic}) one needs to compute $B_l^{\pm}$ which are often rather difficult to find. Recall that $\mathcal{L}_n$ was defined as the Fourier Transform of $f(E)$, this allows the use of the Fourier Tauberian formula to obtain
+\begin{equation}
+    \mathcal{L}_n\sim \frac{1}{n^{s/2}}\sum_{l=0}^{L-1} b_l e^{-in\Lvanhove}, \label{eq:loschmidt_asymptote}
+\end{equation}
+where 
+\begin{equation}
+    b_l=\Gamma\left(\frac{s}{2}\right)\left(\frac{1}{\tau}\right)^{s/2} \sum_{l'\sim l} \left[\frac{A^+_l'}{i^{s/2}}+\frac{A_l'^-}{(-i)^{s/2}}\right],
+\end{equation}
+where the summation runs over all the singular energies that are mapped to the same singularity when making the $\lambda=E\tau$ change of variables. $\hat{\mathcal{L}}(e^{i\lambda})$ can be obtained by multiplying Eq.~(\ref{eq:loschmidt_asymptote}) by $e^{i\lambda n}$ and summing over n. For $\lambda=\Lvanhove\pm\varepsilon$ one obtains
+\begin{equation}
+    \hat{\mathcal{L}}(e^{i\lambda})\sim \Tilde{\mathcal{L}}_l(\pm\varepsilon)+\Gamma\left(1-\frac{s}{2}\right)b_l (\mp\varepsilon)^{s/2-1}. \label{eq:zloschmidt_asymptote}
+\end{equation}
+Comparing Eq.~(\ref{eq:zloschmidt_asymptote}) with Eq.~(\ref{eq:z_loschmidt_expansion}) one obtains an expression for $B_l^{\pm}$ in terms of $b_l$:
+\begin{equation}
+    B_l^{\pm}=\Gamma\left(1-\frac{s}{2}\right)e^{\mp i\pi (s-2)/4}b_l. \label{eq:Bl_coefficients}
+\end{equation}
+Using Eq.~(\ref{eq:Bl_coefficients} one can rewrite the asymptotic behaviour of $\varphi_n$ in terms of $b_l$:
+\begin{equation}
+    \varphi_n \sim \begin{cases}
+        \frac{\left(1-\frac{s}{2}\right)\sin\left(\frac{\pi s}{2}\right)}{\pi n^{2-s/2}}\sum_{l=0}^{L}\frac{e^{-in\Lvanhove}}{b_l},  & s<2
+        \\
+        \frac{1}{n^{s/2}}\sum_{l=0}^{L-1}\frac{c_l}{[\hat{\mathcal{L}}(e^{i\Lvanhove})]^2} e^{-in\Lvanhove}, &s>2.
+    \end{cases}
+\end{equation}
+For the case $s>2$ although the quantity $\hat{\mathcal{L}}(e^{i\Lvanhove})$ can be computed analytically it is often difficult to do so and often numerical approximations are used. The key insight that this formula gives is that $\varphi_n$ decays algebraically $n^{-\alpha}$ in the unbounded system. The exponent $\alpha$ is entirely determined by the singular behaviour of the measurement spectral density of states. For the special case $s=2$ logarithmic corrections appear, the proof is omitted and only the result will be quoted
+\begin{equation}
+    \varphi_n\sim \frac{1}{n^2(x+\ln n)^4}, \quad s=2,
+\end{equation}
+where $x$ is an arbitrary constant. 
+
+
+\section{Tight Binding Model}
+There exist several variants of quantum walks: discrete time walks, coin tossing walks and tight binding models, see Ref.~\cite{konno_quantum_2002} for a review on the topic. This section will provide all the necessary information that are required to calculate the first detected return of a single particle on a Tight Binding Hamiltonian $\tb$.
+The Hamiltonian $\tb$ in the second quantization formalism is given by
+\begin{equation}\label{eq:tight_binding}
+\tb=\sum_{j=1}^{L}(\creation_{j+1}\annihilation_j+\creation_{j}\annihilation_{j+1}).
+\end{equation}
+\subsection{Eigenstates and Eigenenergies}
+Assume periodic boundary conditions $\creation_{L+n}=\creation_{n}$, then by Bloch Theorem \cite{} the eigenstates $\ket{\phi_k}$ are 
+\begin{equation}
+    \ket{\phi_k}=\sum_{n=1}^L \frac{e^{2\pi i kn/L}}{\sqrt{L}}\ket{n}.
+\end{equation}
+The Hamiltonian in the $\ket{\phi_k}$ basis is
+\begin{align}
+    \bra{\phi_j}\tb\ket{\phi_k}&=\frac{1}{L}\left(
+    \sum_{n,m=1}^Le^{ 2\pi i (kn-jm)/L} \braket{m}{n-1}+\sum_{n,m=1}^L e^{2\pi i(kn-jm)/L}\braket{m}{n+1}
+    \right)
+    \\
+    &=\frac{1}{L}\left(
+    \sum_{n,m=1}^Le^{2\pi i (kn-jm)/L} \delta_{m,n-1}+\sum_{n,m=1}^L e^{2\pi i(kn-jm)/L} \delta_{m,n+1}
+    \right)
+    \\
+    &=\frac{1}{L}\left(
+    \sum_{n=1}^L e^{2\pi i(kn-jn+j)/L} + \sum_{n=1}^L e^{2\pi i (kn-jn-j)/L}
+    \right)
+    \\
+    &=\left(e^{2\pi i j/L}+e^{-2\pi ij/L}\right)\frac{1}{L}\sum_{n=1}^L e^{2\pi i n (k-j)/L}
+    \\
+    &=2 \cos (\frac{2 \pi j}{L}) \delta_{j,k}.
+\end{align}
+Hence, the energy spectrum of the tight binding model is $E_k=2\cos(2\pi k/L)$.
+
+\subsection{Loschmidt Amplitude}
+Let the target state and initial state be the origin $\ket{1}$ which equals to $\ket{1}=\frac{1}{\sqrt{L}}\sum_{k=1}^{L}e^{2\pi i k/L}\ket{\phi_k}$ in the eigenstates of $\tb$ basis, the Loschmidt amplitude is then given by 
+\begin{align}
+    \mathcal{L}(t)&=\expval{e^{-i \tb t}}{1},
+    \\
+    &=\frac{1}{L}\sum_{k=1}^Le^{-iE_kt}
+    \\
+    &=\frac{1}{L}\sum_{k=1}^{L}e^{-2it\cos(2\pi k/L)},
+\end{align}
+In the continuum limit the summation turns into an integral
+\begin{align}
+    \mathcal{L}(t)&=\lim_{L\to\infty}\frac{1}{L}\sum_{k=1}^{L}e^{-2it\cos(2\pi k/L)},
+    \\
+    &=\int_0^1 e^{-2it\cos(2\pi x)} \dd x,
+    \\
+    &=J_0(2t)
+\end{align}
+where $J_0(...)$ is the zeroth Bessel function of the first kind. It is also instructive to re-derive the Loschmidt Amplitude using the density of states.
+Given 
+\begin{equation}
+    E(k)=2\cos \left(\frac{2\pi k}{ L}\right),
+\end{equation}
+then
+\begin{equation}
+    k=\frac{L}{2\pi}\arccos(\frac{E}{2}).
+\end{equation}
+The density of states $\rho(E)$ is given by
+\begin{align}
+    \rho(E)&=\dv{k}{E}
+    \\
+    &=\frac{-L}{2\pi \sqrt{4-E^2}}.
+\end{align}
+The Loschmidt Amplitude using the density of states is given by:
+\begin{align}
+    \mathcal{L}(t)&=\frac{1}{L}\sum_{k=1}^{L}e^{-iE_kt},
+    \\
+    &=\frac{1}{L}\int_{2}^{-2}\rho(E)e^{-iEt}\dd E, \label{eq:loschmidt_amplitude_density_states_step}
+    \\
+    &=\frac{1}{L}\int_{-2}^{2} \frac{L}{2\pi \sqrt{4-E^2}}e^{-iEt}\dd E,
+    \\
+    &=J_0(2t).
+\end{align}
+The limits of integration on line (\ref{eq:loschmidt_amplitude_density_states_step}) are obtained from $2>E(k)>-2$. It is important to note that for the Tight Binding model for a single particle at the position at the origin, the measurement spectral density of states $f(E)$ behaves exactly like the density of states $\rho(E)$ except with a factor of $L$. The fact that both $f(E)$ and $\rho(E)$ share the same singular behaviour is not a coincidence but a feature of translational invariance of $\ket{\psi_0}$ \cite{Thiel_2018}, i.e. the Loschmidt amplitude is independent of which lattice site is chosen as the initial condition.
+\section{First Detected Return of a Quantum Walker}
+This section will examine the behaviour of the first detected return of a single particle on a tight binding lattice, the calculation will be done both by method of contour integration and by using the asymptotic formula shown in Section~\ref{sec:spectral_dimension}.
+\subsection{Contour Integration}
+\subsection{Spectral Dimension}
+\subsection{Special case $\tau=\frac{\pi}{2}$}
+\section{Anderson Model}
+\subsection{Transfer Matrix Method}
+\subsection{Green's Function}
+\section{Numerical Analysis}
+\subsection{Finite System Size Effects}
+\section{}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{}
+\begin{equation}\label{eq:general_tb_model}
+    \H=\sum_{j}\gamma^{}_j(\creation_{j+1}\annihilation_j+\creation_{j}\annihilation_{j+1})+\varepsilon^{}_j\creation_j\annihilation_j,
+\end{equation}
+where $\gamma_j$ are the hopping rate between lattice sites and $\varepsilon_j$ are the onsite potential energies. A matrix representation of $\H$ can be constructed in the occupancy number basis of one particle $\ket{n}=\creation_n\ket{\nu}$, where $\ket{\nu}$ denotes the vacuum state. The matrix elements of $\H$ are given by
+\begin{align}
+    \H_{mn}&=\bra{m}\H\ket{n}   
+    \\
+    &=\sum_j \gamma_j\bra{m}\creation_{j}\annihilation_{j+1}\ket{n} +\gamma_j\bra{m}\creation_{j+1}\annihilation_{j}\ket{n} + \varepsilon^{}_j\bra{m}\creation_{j}\annihilation_{j}\ket{n} 
+    \\
+    &= \sum_j \gamma_j\bra{m}\creation_{j}\delta^{}_{j+1,n}\ket{\nu}
+    +\gamma_j\bra{m}\creation_{j+1}\delta^{}_{j,n}\ket{\nu} +
+    \varepsilon^{}_j\bra{m}\creation_{j}\delta^{}_{j,n}\ket{\nu} 
+    \\
+    &= \gamma_{n-1}\bra{m}\ket{n-1}+\gamma_{n+1}\bra{m}\ket{n+1}+\varepsilon_n\bra{m}\ket{n}
+    \\
+    &=\gamma_{n-1}\delta_{m,n-1}+\gamma_{n+1}\delta_{m,n+1}+\varepsilon_n\delta_{m,n}, \label{eq:general_tb_matrix}
+\end{align}
+it is far more informative to look expression (\ref{eq:general_tb_matrix}) in matrix form:
+\begin{equation}
+\mathcal{H}=
+    \mqty(
+     \varepsilon_1 & \gamma_1 & 0_{}   &\cdots & 
+    \\
+     \gamma_2 &  \varepsilon_2 & \gamma_2 &0&\cdots
+    \\
+    0 &  \gamma_3 & \varepsilon_3 & \gamma_3  & 0 
+    \\
+    \vdots &  \ddots &\ddots &\ddots &\ddots )
+\end{equation}
+\subsection{Disorder Free}
+The disordered free system is modelled by $\gamma_j=1$ and $\varepsilon=0$:
+\begin{equation}
+    \H_{tb}=\sum_{j}(\creation_{j+1}\annihilation_j+\creation_{j}\annihilation_{j+1}).
+\end{equation}
+This Hamiltonian models a single particle that is allowed to only move to its neighbouring lattice site with equal probability.
+
+
+% \section{Tight Binding Model}
+% A quantum equivalent of a random walk can be modelled through the Tight Binding Model. This chapter provides all the tools indispensable 
+
+% The purpose of this chapter is to provide a review of the Tight Binding Model, which is used as a toy model for a quantum equivalent of a random walk. 
+
+
+% Although we are only interested in the energies and eigenstates of the model we provide a review of the tight binding model and its connection to quantum walks and finite difference coefficients. Provide a historical review of how the model came to be.
+% This section provides a review of the Tight Binding Model and gives some insights on the connection between the model and quantum walks. Although
+% \subsection{Eigenstates}
+% \subsection{Energies}
+
 
 
 
 \section{Quantum Random Walk}
-A quantum random walk can be described by the tight binding model which takes the form of Eq.(\ref{QRW1}) in the second quantization formalism
-\begin{equation}\label{QRW1}
-    \H=\sum_{i}\creation_{i+1}\annihilation_i+\creation_{i}\annihilation_{i+1}+\varepsilon^{}_i\creation_i\annihilation_i,
+A quantum random walk is described by a Hamiltonian $\H$ of the form given by Eq.~(\ref{eq:general_tb_model}), where $\gamma_j$ are the hopping rate between lattice sites and $\{\varepsilon\}$ are the onsite potential energies.
+\begin{equation}\label{eq:general_tb_model}
+    \H=\sum_{j}\gamma^{}_j(\creation_{j+1}\annihilation_j+\creation_{j}\annihilation_{j+1})+\varepsilon^{}_j\creation_j\annihilation_j,
 \end{equation}
 where $\creation,\annihilation$ are the creation and annihilation operators respectively.
-A matrix representation of $\H$ can be constructed in the occupancy number basis of one particle $\ket{n}=\creation_n\ket{0}$, where $\ket{0}$ denotes the vacuum state. The matrix elements of $\H$ are given by
-\begin{equation}\label{QRW2}
-    \H_{mn}=\bra{m}\H\ket{n}
+A matrix representation of $\H$ can be constructed in the occupancy number basis of one particle $\ket{n}=\creation_n\ket{\nu}$, where $\ket{\nu}$ denotes the vacuum state. The matrix elements of $\H$ are given by
+\begin{align}
+    \H_{mn}&=\bra{m}\H\ket{n}   
+    \\
+    &=\sum_j \gamma_j\bra{m}\creation_{j}\annihilation_{j+1}\ket{n} +\gamma_j\bra{m}\creation_{j+1}\annihilation_{j}\ket{n} + \varepsilon^{}_j\bra{m}\creation_{j}\annihilation_{j}\ket{n} 
+    \\
+    &= \sum_j \gamma_j\bra{m}\creation_{j}\delta^{}_{j+1,n}\ket{\nu}
+    +\gamma_j\bra{m}\creation_{j+1}\delta^{}_{j,n}\ket{\nu} +
+    \varepsilon^{}_j\bra{m}\creation_{j}\delta^{}_{j,n}\ket{\nu} 
+    \\
+    &= \gamma_{n-1}\bra{m}\ket{n-1}+\gamma_{n+1}\bra{m}\ket{n+1}+\varepsilon_n\bra{m}\ket{n}
+    \\
+    &=\gamma_{n-1}\delta_{m,n-1}+\gamma_{n+1}\delta_{m,n+1}+\varepsilon_n\delta_{m,n}, \label{eq:general_tb_matrix}
+\end{align}
+it is far more informative to look expression (\ref{eq:general_tb_matrix}) in matrix form:
+\begin{equation}
+    \mqty(
+    \gamma_1 & \varepsilon_1 & \gamma_1 & 0 & 0 &\cdots 
+    \\
+    0 & \gamma_2 & \varepsilon_2 & \gamma_2 & 0&\ddots
+    \\
+    \vdots & \ddots & \ddots & \ddots  & \ddots &\ddots
+    )
 \end{equation}
+\newpage
+
+
+
+
+
+
+\section{First Detected Return of a Quantum Walker}
+This section will provide an example on how the tools mentioned in Section~\ref{sec:stroboscopic_measurement_protocol} are used to calculate the first detected return of a quantum walker. This section deals with the disorder free quantum walker which is described by the tight binding Hamiltonian $\H_{tb}$.
+\subsection{Contour Integration}
+\subsection{Spectral Dimension}
+
+
+
+\subsection{Anderson Model}
+
+\printbibliography
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 \section{Email}
 I have only a small comment on the analytics of the FDT provided the Loschmidt amplitude indeed becomes constant.
 
@@ -134,11 +620,12 @@ so we just need to find $\lambda$. Although this is a calculation for the large 
 
 On a different note, in the large $W$ limit, we should be able to (like in the paper) neglect off-diagonal terms and assume that the Loschmidt amplitude is approximated by
 
-$$<0| e^{-i \epsilon_k \tau} | 0> = \int_{-W}^W \dint{w} e^{i w \tau} = 2 \frac{\sin(W \tau)}{\tau}$$
+$$<0| e^{-i \epsilon_k \tau} | 0> = \int_{-W}^W \int{w} e^{i w \tau} = 2 \frac{\sin(W \tau)}{\tau}$$
 
 and then the Loschmidt echo should go like
 
 $$4 \sin^2(W \tau) \tau^{-2}$$
 
 It doesn’t really work with the plots you showed me though, as there the terms go against a constant for large $\tau.$ I’d be curious though if the oscillations are somehow well captured by the $\sin^2(W \tau)$ term? Or does it not work at all? Is there something like a constant offset?
+\printbibliography  
 \end{document}
