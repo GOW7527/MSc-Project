@@ -6,7 +6,7 @@ import h5py
 import argparse
 #Paths
 path=os.getcwd()
-path=os.path.join(path,'data_19/05')
+path=os.path.join(path,'Decay')
 #Model
 class anderson():
     def __init__(self,energy):
@@ -38,7 +38,7 @@ class anderson():
         for t in time_array:
             amplitude.append(self.return_amplitude(t))
         F=self.phi(amplitude)
-        return np.abs(np.array(F))**2
+        return np.array(F,dtype=np.complex_), np.array(amplitude,dtype=np.complex_)
 #Running the script
 #Parameters for first detection time 
 np.random.seed(0)
@@ -58,24 +58,30 @@ for i in range(sampling):
     elements+=sampling_rate
 ####
 lattice_size=int(2.5*sampling*sampling_rate)
-filename=f"anderson:W={W},t={sampling_rate},n={sampling}.h5"
+filename=f"decay:W={W},t={sampling_rate},n={sampling}.h5"
 filepath=os.path.join(path,filename)
 try: 
     with h5py.File(filepath,'r') as f:
-        detection_array=f['detection_time'][:]
-    N=30000-detection_array.shape[0]
+        detection_array=f['amplitude'][:]
+    N=10000-detection_array.shape[0]
 except: 
     with h5py.File(filepath, 'x') as f:
-        dset=f.create_dataset('detection_time',shape=(0,sampling),maxshape=(None,sampling) ,chunks=True)
-    N=30000
+        dset_amplitude=f.create_dataset('amplitude',shape=(0,sampling),maxshape=(None,sampling) ,chunks=True,dtype=np.complex_)
+        dset_echo=f.create_dataset('echo',shape=(0,sampling),maxshape=(None,sampling) ,chunks=True,dtype=np.complex_)
+    N=10000
 for i in range(N):
     energy=np.random.uniform(-W/2,W/2,lattice_size)
     model=anderson(energy)
-    F=model.F_n(time)
+    phi_k,L_k=model.F_n(time)
     with h5py.File(filepath,'a') as f:
-        detection_time=f['detection_time']
+        amplitude=f['amplitude']
+        echo=f['echo']
         #Appending data
         #Resizing the dataset
-        detection_time.resize((detection_time.shape[0]+1,detection_time.shape[1]))
+        amplitude.resize((amplitude.shape[0]+1,amplitude.shape[1]))
+        echo.resize((echo.shape[0]+1,echo.shape[1]))
         #Adding data
-        detection_time[-1:]=F
+        echo[-1:]=L_k.astype(np.complex_)
+        amplitude[-1:]=phi_k.astype(np.complex_)
+
+
